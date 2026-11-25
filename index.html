@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GelatoArt Repositor — Gestão Comercial e Estoque</title>
+
+    <!-- Requisitos Obrigatórios de Otimização -->
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preload" href="./style.css" as="style">
+
+    <!-- Tipografia Editorial & Interface -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./style.css">
+    <!-- Biblioteca Profissional de Ícones (Lucide via jsDelivr) -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+
+    <div class="app-layout">
+        <!-- Overlay Mobile -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- Menu Lateral (Marrom Chocolate Escuro) -->
+        <aside id="sidebar" class="sidebar" aria-label="Navegação Principal">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-mark" aria-hidden="true">
+                        <!-- Emblema Minimalista GelatoArt -->
+                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 12C7 8.13401 10.134 5 14 5C17.866 5 21 8.13401 21 12H7Z" fill="#EFE5D8"/>
+                            <path d="M6 13.5H22L20.2 22.5C20.05 23.35 19.3 24 18.43 24H9.57C8.7 24 7.95 23.35 7.8 22.5L6 13.5Z" stroke="#EFE5D8" stroke-width="1.75"/>
+                            <path d="M10.5 9.5C11.5 8.3 12.8 7.8 14.3 7.8" stroke="#35231B" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">GelatoArt</span>
+                        <span class="brand-sub">PREMIUM ICE CREAM</span>
+                    </div>
+                </div>
+                <button type="button" id="btn-fechar-menu" class="btn-icon-dark mobile-only min-44" aria-label="Fechar menu">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-section-label">OPERAÇÃO</div>
+
+            <nav class="sidebar-nav">
+                <button type="button" class="nav-item active min-44" data-view="dashboard">
+                    <i data-lucide="layout-dashboard" class="nav-icon"></i>
+                    <span>Visão geral</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="estoque">
+                    <i data-lucide="package" class="nav-icon"></i>
+                    <span>Estoque</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="catalogo">
+                    <i data-lucide="ice-cream" class="nav-icon"></i>
+                    <span>Produtos</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="pedidos">
+                    <i data-lucide="shopping-bag" class="nav-icon"></i>
+                    <span>Pedidos</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="reposicao">
+                    <i data-lucide="package-plus" class="nav-icon"></i>
+                    <span>Reposição</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="entregas">
+                    <i data-lucide="truck" class="nav-icon"></i>
+                    <span>Entregas</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="historico">
+                    <i data-lucide="history" class="nav-icon"></i>
+                    <span>Histórico</span>
+                </button>
+                <button type="button" class="nav-item min-44" data-view="alertas">
+                    <i data-lucide="bell" class="nav-icon"></i>
+                    <span>Notificações</span>
+                    <span id="badge-menu-alertas" class="badge-pill">0</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-unit-box">
+                    <span class="unit-label">Unidade Ativa</span>
+                    <strong class="unit-name">Fábrica &amp; Loja Matriz</strong>
+                </div>
+                <button type="button" id="btn-reset-demo" class="btn-sidebar-ghost min-44">
+                    <i data-lucide="rotate-ccw"></i>
+                    <span>Restaurar Dados Demo</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Área Principal -->
+        <div class="main-wrapper">
+            <!-- Barra Superior Minimalista -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button type="button" id="btn-abrir-menu" class="btn-icon mobile-only min-44" aria-label="Abrir menu">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="topbar-brand-mobile">
+                        <span class="brand-title-dark">GelatoArt</span>
+                    </div>
+                    <div class="topbar-date-box">
+                        <i data-lucide="calendar" class="icon-sm"></i>
+                        <span id="data-atual">--/--/----</span>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div id="status-conexao" class="status-badge" role="status">
+                        Verificando conexão...
+                    </div>
+
+                    <div id="fila-offline-badge" class="offline-queue-badge hidden" title="Operações armazenadas localmente">
+                        <i data-lucide="cloud-off" class="icon-sm"></i>
+                        <span><strong id="qtd-fila-offline">0</strong> pendente(s)</span>
+                    </div>
+
+                    <button type="button" id="btn-atalho-alertas" class="btn-notif-top min-44" aria-label="Notificações">
+                        <i data-lucide="bell"></i>
+                        <span id="badge-top-alertas" class="notif-dot">0</span>
+                    </button>
+
+                    <div class="user-profile">
+                        <div class="user-avatar" aria-hidden="true">
+                            <i data-lucide="user-round"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">Carlos Andrade</span>
+                            <select id="select-perfil" class="select-perfil min-44" aria-label="Perfil de acesso">
+                                <option value="Vendedor">Vendedor</option>
+                                <option value="Entregador">Entregador</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Banner de Sincronização Offline -->
+            <div id="banner-sync" class="banner-sync hidden" role="alert">
+                <div class="banner-sync-text">
+                    <i data-lucide="database"></i>
+                    <div>
+                        <strong>Fila Local Offline:</strong> <span id="banner-sync-qtd">0</span> operação(ões) aguardando integração remota.
+                        <small>Armazenado localmente via <code>SyncService</code>.</small>
+                    </div>
+                </div>
+                <button type="button" id="btn-exportar-fila" class="btn-secundario btn-sm min-44">
+                    Inspecionar Fila
+                </button>
+            </div>
+
+            <main class="content-area">
+
+                <!-- 1. VISÃO GERAL (DASHBOARD) -->
+                <section id="view-dashboard" class="view-section active">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">PAINEL EXECUTIVO</span>
+                            <h1 id="saudacao-usuario">Olá, Carlos Andrade</h1>
+                            <p class="subtitle">Acompanhe o saldo das câmaras frias, pedidos comerciais e rotas de entrega.</p>
+                        </div>
+                        <div class="header-actions">
+                            <button type="button" class="btn-secundario min-44" data-goto="estoque">
+                                <i data-lucide="package"></i>
+                                <span>Conferir Estoque</span>
+                            </button>
+                            <button type="button" class="btn-sorvete min-44" data-goto="reposicao">
+                                <i data-lucide="package-plus"></i>
+                                <span>Nova Reposição</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="kpi-grid" id="dashboard-kpis"></div>
+
+                    <div class="charts-grid">
+                        <article class="card-sorvete">
+                            <div class="card-head">
+                                <div>
+                                    <h3>Movimentação de Estoque</h3>
+                                    <p class="card-desc">Volume diário em caixas de 10 litros</p>
+                                </div>
+                                <i data-lucide="bar-chart-3" class="icon-muted"></i>
+                            </div>
+                            <div id="chart-movimentacao" class="bar-chart-container"></div>
+                        </article>
+
+                        <article class="card-sorvete">
+                            <div class="card-head">
+                                <div>
+                                    <h3>Sabores Mais Vendidos</h3>
+                                    <p class="card-desc">Desempenho acumulado na semana</p>
+                                </div>
+                                <i data-lucide="award" class="icon-muted"></i>
+                            </div>
+                            <div id="chart-sabores" class="horizontal-chart-container"></div>
+                        </article>
+
+                        <article class="card-sorvete">
+                            <div class="card-head">
+                                <div>
+                                    <h3>Pedidos por Período</h3>
+                                    <p class="card-desc">Solicitações comerciais registradas</p>
+                                </div>
+                                <i data-lucide="trending-up" class="icon-muted"></i>
+                            </div>
+                            <div id="chart-pedidos" class="bar-chart-container"></div>
+                        </article>
+                    </div>
+
+                    <div class="dashboard-bottom-grid">
+                        <article class="card-sorvete">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>Atividades Recentes</h3>
+                                    <p class="card-desc" style="margin:2px 0 0;">Últimos registros operacionais da unidade</p>
+                                </div>
+                                <button type="button" class="btn-link min-44" data-goto="historico">
+                                    <span>Histórico completo</span>
+                                    <i data-lucide="arrow-right" class="icon-sm"></i>
+                                </button>
+                            </div>
+                            <div id="dashboard-atividades" class="activity-list"></div>
+                        </article>
+
+                        <article class="card-sorvete">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3>Alertas de Reposição</h3>
+                                    <p class="card-desc" style="margin:2px 0 0;">Itens que exigem atenção imediata</p>
+                                </div>
+                                <button type="button" class="btn-link min-44" data-goto="alertas">
+                                    <span>Ver central</span>
+                                    <i data-lucide="arrow-right" class="icon-sm"></i>
+                                </button>
+                            </div>
+                            <div id="dashboard-alertas-resumo" class="activity-list"></div>
+                        </article>
+                    </div>
+                </section>
+
+                <!-- 2. ESTOQUE -->
+                <section id="view-estoque" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">CONTROLE DE CÂMARA</span>
+                            <h1>Estoque da Loja</h1>
+                            <p class="subtitle">Gestão por unidade de medida padrão: caixas profissionais de 10 litros</p>
+                        </div>
+                        <button type="button" class="btn-sorvete min-44" data-goto="reposicao">
+                            <i data-lucide="package-plus"></i>
+                            <span>Solicitar Reposição</span>
+                        </button>
+                    </div>
+
+                    <div class="card-sorvete filters-bar">
+                        <div class="input-with-icon">
+                            <i data-lucide="search" class="input-icon"></i>
+                            <input type="search" id="filtro-estoque-busca" class="input-sorvete has-icon min-44" placeholder="Pesquisar por sabor...">
+                        </div>
+                        <select id="filtro-estoque-categoria" class="input-sorvete min-44" aria-label="Filtrar por categoria">
+                            <option value="todas">Todas as Categorias</option>
+                            <option value="Clássicos">Clássicos</option>
+                            <option value="Frutas">Frutas</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Especiais">Especiais</option>
+                        </select>
+                        <select id="filtro-estoque-status" class="input-sorvete min-44" aria-label="Filtrar por disponibilidade">
+                            <option value="todos">Todos os Status</option>
+                            <option value="disponivel">Disponível (&gt; 8 caixas)</option>
+                            <option value="baixo">Estoque Baixo (1 a 8 caixas)</option>
+                            <option value="critico">Crítico / Indisponível (0 caixas)</option>
+                        </select>
+                        <button type="button" id="btn-limpar-filtros-estoque" class="btn-secundario min-44">
+                            <i data-lucide="layers"></i>
+                            <span>Ver Todos</span>
+                        </button>
+                    </div>
+
+                    <div id="lista-estoque" class="cards-grid"></div>
+                </section>
+
+                <!-- 3. CATÁLOGO DE PRODUTOS -->
+                <section id="view-catalogo" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">VITRINE COMERCIAL</span>
+                            <h1>Catálogo de Sorvetes</h1>
+                            <p class="subtitle">Linha artesanal GelatoArt em potes profissionais de 10 litros</p>
+                        </div>
+                        <button type="button" class="btn-sorvete min-44" data-goto="reposicao">
+                            <i data-lucide="shopping-bag"></i>
+                            <span>Montar Pedido de Reposição</span>
+                        </button>
+                    </div>
+
+                    <div id="lista-catalogo" class="cards-grid"></div>
+                </section>
+
+                <!-- 4. PEDIDOS -->
+                <section id="view-pedidos" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">ATENDIMENTO COMERCIAL</span>
+                            <h1>Pedidos de Clientes</h1>
+                            <p class="subtitle">Controle de solicitações, preparação e despacho para pontos parceiros</p>
+                        </div>
+                        <button type="button" id="btn-abrir-modal-pedido" class="btn-sorvete min-44">
+                            <i data-lucide="plus"></i>
+                            <span>Novo Pedido Manual</span>
+                        </button>
+                    </div>
+
+                    <div class="card-sorvete filters-bar">
+                        <div class="input-with-icon">
+                            <i data-lucide="search" class="input-icon"></i>
+                            <input type="text" id="filtro-pedido-cliente" class="input-sorvete has-icon min-44" placeholder="Buscar cliente ou nº do pedido...">
+                        </div>
+                        <input type="date" id="filtro-pedido-data" class="input-sorvete min-44" aria-label="Filtrar por data">
+                        <select id="filtro-pedido-status" class="input-sorvete min-44" aria-label="Filtrar por situação">
+                            <option value="todos">Todas as Situações</option>
+                            <option value="Novo pedido">Novo pedido</option>
+                            <option value="Aguardando confirmação">Aguardando confirmação</option>
+                            <option value="Em preparação">Em preparação</option>
+                            <option value="Saiu para entrega">Saiu para entrega</option>
+                            <option value="Entregue">Entregue</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                        <button type="button" id="btn-limpar-filtros-pedido" class="btn-secundario min-44">
+                            <i data-lucide="filter-x"></i>
+                            <span>Limpar Filtros</span>
+                        </button>
+                    </div>
+
+                    <div id="lista-pedidos" class="pedidos-list"></div>
+                </section>
+
+                <!-- 5. REPOSIÇÃO -->
+                <section id="view-reposicao" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">ABASTECIMENTO DE LOJA</span>
+                            <h1>Reposição de Estoque</h1>
+                            <p class="subtitle">Solicitação direta à fábrica e atualização automática ao concluir o recebimento</p>
+                        </div>
+                    </div>
+
+                    <div class="reposicao-layout">
+                        <article class="card-sorvete">
+                            <h2>Nova Solicitação de Reposição</h2>
+                            <p class="card-desc">Selecione a unidade de destino e a quantidade de caixas (10L) por sabor.</p>
+                            <form id="form-reposicao">
+                                <div class="campo-form">
+                                    <label for="ponto-venda"><strong>Loja / Ponto de Venda</strong></label>
+                                    <select id="ponto-venda" class="input-sorvete min-44" required>
+                                        <option value="Loja Matriz — Centro">Loja Matriz — Centro</option>
+                                        <option value="Quiosque Shopping Plaza">Quiosque Shopping Plaza</option>
+                                        <option value="Unidade Avenida Paulista">Unidade Avenida Paulista</option>
+                                        <option value="Ponto Parque Ibirapuera">Ponto Parque Ibirapuera</option>
+                                    </select>
+                                </div>
+
+                                <h3 class="subsection-title">Sabores para Reposição (Caixas 10L)</h3>
+                                <div id="reposicao-sabores-inputs" class="grade-sabores"></div>
+
+                                <div class="resumo-box" id="resumo-reposicao">
+                                    <h4>Resumo da Solicitação</h4>
+                                    <p class="muted">Nenhuma caixa selecionada ainda.</p>
+                                </div>
+
+                                <button type="submit" class="btn-sorvete btn-full min-44">
+                                    <i data-lucide="check-circle-2"></i>
+                                    <span>Confirmar Pedido de Reposição</span>
+                                </button>
+                            </form>
+                        </article>
+
+                        <article class="card-sorvete">
+                            <h2>Solicitações em Andamento</h2>
+                            <p class="card-desc">Ao alterar para <strong>Reposição concluída</strong>, o saldo é somado ao estoque.</p>
+                            <div id="lista-reposicoes" class="reposicoes-list"></div>
+                        </article>
+                    </div>
+                </section>
+
+                <!-- 6. ENTREGAS -->
+                <section id="view-entregas" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">LOGÍSTICA DE CAMPO</span>
+                            <h1>Controle de Entregas</h1>
+                            <p class="subtitle">Roteiro dos entregadores e confirmação com registro de data e hora</p>
+                        </div>
+                    </div>
+
+                    <div id="lista-entregas" class="cards-grid"></div>
+                </section>
+
+                <!-- 7. HISTÓRICO -->
+                <section id="view-historico" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">RASTREABILIDADE</span>
+                            <h1>Histórico de Movimentações</h1>
+                            <p class="subtitle">Registro cronológico de entradas, saídas, reposições e entregas</p>
+                        </div>
+                    </div>
+
+                    <div class="card-sorvete filters-bar">
+                        <select id="filtro-historico-periodo" class="input-sorvete min-44" aria-label="Filtrar por período">
+                            <option value="todos">Todo o Período</option>
+                            <option value="hoje">Hoje</option>
+                            <option value="7dias">Últimos 7 dias</option>
+                        </select>
+                        <select id="filtro-historico-tipo" class="input-sorvete min-44" aria-label="Filtrar por tipo">
+                            <option value="todos">Todos os Tipos</option>
+                            <option value="Entrada">Entrada de produtos</option>
+                            <option value="Saída">Saída de produtos</option>
+                            <option value="Reposição">Reposição de estoque</option>
+                            <option value="Pedido">Pedidos realizados</option>
+                            <option value="Entrega">Entregas concluídas</option>
+                            <option value="Status">Alterações de status</option>
+                        </select>
+                    </div>
+
+                    <div class="card-sorvete table-responsive">
+                        <table class="tabela-historico">
+                            <thead>
+                                <tr>
+                                    <th>Data / Horário</th>
+                                    <th>Movimentação</th>
+                                    <th>Produto / Referência</th>
+                                    <th>Quantidade</th>
+                                    <th>Observação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-historico-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- 8. NOTIFICAÇÕES -->
+                <section id="view-alertas" class="view-section">
+                    <div class="section-header">
+                        <div>
+                            <span class="eyebrow">CENTRAL DE AVISOS</span>
+                            <h1>Alertas e Notificações</h1>
+                            <p class="subtitle">Monitoramento automático de estoque crítico, pedidos e entregas</p>
+                        </div>
+                        <button type="button" id="btn-notificacao" class="btn-sorvete min-44">
+                            <i data-lucide="bell-ring"></i>
+                            <span>ATIVAR ALERTAS DE REPOSIÇÃO</span>
+                        </button>
+                    </div>
+
+                    <div id="status-permissao-notif" class="card-sorvete info-notif-bar">
+                        <i data-lucide="shield-check" class="icon-sm"></i>
+                        <span>Permissão de notificações do navegador: <strong id="texto-permissao-notif">Verificando...</strong></span>
+                    </div>
+
+                    <div id="lista-alertas" class="alertas-list"></div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Pedido Manual -->
+    <div id="modal-novo-pedido" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-pedido">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="titulo-modal-pedido">Registrar Novo Pedido</h2>
+                <button type="button" class="btn-icon min-44" data-close-modal="modal-novo-pedido" aria-label="Fechar modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="form-novo-pedido">
+                <div class="campo-form">
+                    <label for="pedido-cliente-nome">Nome do Cliente / Estabelecimento</label>
+                    <input type="text" id="pedido-cliente-nome" class="input-sorvete min-44" placeholder="Ex: Empório Bella Vista" required>
+                </div>
+                <div class="campo-form">
+                    <label for="pedido-cliente-endereco">Endereço de Entrega</label>
+                    <input type="text" id="pedido-cliente-endereco" class="input-sorvete min-44" placeholder="Ex: Rua das Flores, 420 - Centro" required>
+                </div>
+                <div class="campo-form">
+                    <label for="pedido-produto">Sabor (Caixa 10L — R$ 180,00/cx)</label>
+                    <select id="pedido-produto" class="input-sorvete min-44" required></select>
+                </div>
+                <div class="campo-form">
+                    <label for="pedido-quantidade">Quantidade (Caixas 10L)</label>
+                    <input type="number" id="pedido-quantidade" class="input-sorvete min-44" min="1" max="50" value="2" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secundario min-44" data-close-modal="modal-novo-pedido">Cancelar</button>
+                    <button type="submit" class="btn-sorvete min-44">Salvar Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes do Produto (Vitrine) -->
+    <div id="modal-detalhe-produto" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="detalhe-produto-titulo">
+        <div class="modal-card modal-produto">
+            <div class="modal-header">
+                <h2 id="detalhe-produto-titulo">Ficha Técnica do Produto</h2>
+                <button type="button" class="btn-icon min-44" data-close-modal="modal-detalhe-produto" aria-label="Fechar detalhes">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="detalhe-produto-conteudo"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes do Pedido -->
+    <div id="modal-detalhe-pedido" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="detalhe-pedido-titulo">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2 id="detalhe-pedido-titulo">Detalhes do Pedido</h2>
+                <button type="button" class="btn-icon min-44" data-close-modal="modal-detalhe-pedido" aria-label="Fechar detalhes">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="detalhe-pedido-conteudo"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn-sorvete min-44" data-close-modal="modal-detalhe-pedido">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Feedback -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <script src="./app.js"></script>
+</body>
+</html>
